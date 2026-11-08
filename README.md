@@ -61,25 +61,21 @@ The model uses the following student information:
 - HSC Marks
 
 ## Project Structure
-
-```text
-LIVE/
+AI-Placement-Intelligence-System/
 │
 ├── app.py
+├── 01_Placement_Analysis.ipynb
+├── README.md
+├── .gitignore
+│
 ├── data/
 │   └── train.csv
 │
 ├── models/
 │   └── placement_model.pkl
 │
-├── notebooks/
-│   └── 01_Placement_Analysis.ipynb
-│
-├── static/
-│
 ├── templates/
 │   └── index.html
 │
-└── README.md
-
+└── static/
 
