@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placement Intelligence System</title>
+
+    <style>
+        :root {
+            --bg: #07151C;
+            --surface: #102B35;
+            --surface-light: #163944;
+            --gold: #F5C451;
+            --gold-dark: #D9A92E;
+            --cyan: #27DDF2;
+            --cyan-soft: #8CEEF5;
+            --text: #F3F7F8;
+            --muted: #A9BEC5;
+            --border: rgba(39, 221, 242, 0.16);
+            --success: #38D99A;
+            --danger: #FF6B78;
+            --shadow: 0 15px 45px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background:
+                radial-gradient(circle at 10% 5%, rgba(39,221,242,0.10), transparent 30%),
+                radial-gradient(circle at 90% 90%, rgba(245,196,81,0.08), transparent 30%),
+                var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 35px 18px;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: auto;
+        }
+
+        /* HEADER */
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .logo {
+            font-size: 13px;
+            letter-spacing: 4px;
+            color: var(--cyan);
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .header h1 {
+            font-size: clamp(28px, 5vw, 43px);
+            font-weight: 800;
+            color: var(--gold);
+            letter-spacing: 1px;
+        }
+
+        .header h1 span {
+            color: var(--cyan);
+        }
+
+        .header p {
+            color: var(--muted);
+            margin-top: 12px;
+            font-size: 15px;
+        }
+
+        .header-line {
+            width: 90px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold), var(--cyan));
+            margin: 20px auto 0;
+            border-radius: 10px;
+        }
+
+        /* MAIN LAYOUT */
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 25px;
+            align-items: start;
+        }
+
+        .panel {
+            background: linear-gradient(145deg, var(--surface), #0C222B);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .panel-title {
+            font-size: 21px;
+            color: var(--gold);
+            margin-bottom: 7px;
+        }
+
+        .panel-subtitle {
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+
+        /* FORM */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 19px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 13px;
+            color: var(--cyan-soft);
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid rgba(39,221,242,0.22);
+            border-radius: 10px;
+            outline: none;
+            background: #091E27;
+            color: var(--text);
+            font-size: 14px;
+            transition: 0.25s;
+        }
+
+        input::placeholder {
+            color: #708992;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(245,196,81,0.12);
+        }
+
+        select option {
+            background: #102B35;
+            color: white;
+        }
+
+        .submit-btn {
+            grid-column: 1 / -1;
+            width: 100%;
+            padding: 15px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 11px;
+            background: linear-gradient(110deg, var(--gold), #FFE29A);
+            color: #172127;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(245,196,81,0.25);
+        }
+
+        /* RESULT PANEL */
+
+        .result-panel {
+            min-height: 300px;
+        }
+
+        .empty-state {
+            min-height: 230px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 12px;
+        }
+
+        .empty-icon {
+            width: 75px;
+            height: 75px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: rgba(39,221,242,0.08);
+            border: 1px solid rgba(39,221,242,0.25);
+            color: var(--cyan);
+            font-size: 30px;
+        }
+
+        .empty-state h3 {
+            color: var(--gold);
+            font-size: 19px;
+        }
+
+        .empty-state p {
+            color: var(--muted);
+            font-size: 13px;
+            max-width: 260px;
+            line-height: 1.6;
+        }
+
+        .result-card {
+            background: #0A2029;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .result-label {
+            color: var(--muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+        }
+
+        .prediction {
+            font-size: 30px;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .prediction.placed {
+            color: var(--success);
+        }
+
+        .prediction.not-placed {
+            color: var(--danger);
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .metric span {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .metric strong {
+            color: var(--cyan);
+            font-size: 17px;
+            overflow-wrap: anywhere;
+        }
+
+        /* READINESS */
+
+        .readiness-section {
+            margin-top: 22px;
+        }
+
+        .readiness-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .readiness-heading span:first-child {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .readiness-heading strong {
+            color: var(--gold);
+            font-size: 19px;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 11px;
+            background: #203943;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 20px;
+            background: linear-gradient(90deg, var(--gold), var(--cyan));
+            transition: width 1s ease;
+        }
+
+        /* FUNNY RESULT SECTION */
+
+        .funny-result {
+            text-align: center;
+            margin: 22px 0;
+            padding: 18px 15px;
+            border-radius: 15px;
+            background: rgba(39, 221, 242, 0.08);
+            border: 1px solid rgba(39, 221, 242, 0.25);
+        }
+
+        .funny-image {
+            width: 85px;
+            height: 85px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid var(--gold);
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+
+        .funny-result h3 {
+            color: var(--gold);
+            margin: 5px 0;
+            font-size: 17px;
+        }
+
+        .funny-result p {
+            color: var(--cyan);
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* TIPS */
+
+        .tips-section {
+            margin-top: 23px;
+        }
+
+        .tips-section h3 {
+            color: var(--gold);
+            font-size: 16px;
+            margin-bottom: 13px;
+        }
+
+        .tips-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .tips-list li {
+            background: rgba(39,221,242,0.06);
+            border-left: 3px solid var(--cyan);
+            padding: 12px;
+            border-radius: 7px;
+            color: #D8E6E9;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* ERROR */
+
+        .error-box {
+            background: rgba(255,107,120,0.1);
+            border: 1px solid rgba(255,107,120,0.35);
+            color: #FF9AA3;
+            padding: 14px;
+            border-radius: 10px;
+            margin-top: 18px;
+            font-size: 13px;
+        }
+
+        /* FOOTER */
+
+        .footer {
+            text-align: center;
+            color: #7F9AA2;
+            font-size: 12px;
+            margin-top: 35px;
+            line-height: 1.8;
+        }
+
+        .footer span {
+            color: var(--gold);
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 850px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 520px) {
+            body {
+                padding: 22px 12px;
+            }
+
+            .panel {
+                padding: 19px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full,
+            .submit-btn {
+                grid-column: auto;
+            }
+
+            .header h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <header class="header">
+
+        <div class="logo">
+            INTELLIGENCE • ANALYTICS • CAREER
+        </div>
+
+        <h1>PLACE<span>INTEL</span> AI</h1>
+
+        <p>AI Based Placement Intelligence System</p>
+        <p>Minor Project - by Pandey Jayant Kumar</p>
+
+        <div class="header-line"></div>
+
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-grid">
+
+        <!-- STUDENT INPUT FORM -->
+        <section class="panel">
+
+            <h2 class="panel-title">Student Profile</h2>
+
+            <p class="panel-subtitle">
+                Enter your academic and skill details for placement analysis.
+            </p>
+
+            <form action="/predict" method="POST" class="form-grid">
+
+                <div class="form-group">
+                    <label for="cgpa">CGPA (0–10)</label>
+                    <input type="number" id="cgpa" name="cgpa"
+                           min="0" max="10" step="0.01"
+                           placeholder="Enter CGPA" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="internships">Internships</label>
+                    <input type="number" id="internships" name="internships"
+                           min="0" step="1"
+                           placeholder="Number of internships" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="projects">Projects</label>
+                    <input type="number" id="projects" name="projects"
+                           min="0" step="1"
+                           placeholder="Number of projects" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="workshops">Workshops / Certifications</label>
+                    <input type="number" id="workshops" name="workshops"
+                           min="0" step="1"
+                           placeholder="Enter count" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="aptitude">Aptitude Test Score (0–100)</label>
+                    <input type="number" id="aptitude" name="aptitude"
+                           min="0" max="100" step="0.01"
+                           placeholder="Enter score" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="softskills">Soft Skills Rating (0–5)</label>
+                    <input type="number" id="softskills" name="softskills"
+                           min="0" max="5" step="0.1"
+                           placeholder="Enter rating" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="extracurricular">Extracurricular Activities</label>
+                    <select id="extracurricular" name="extracurricular" required>
+                        <option value="" disabled selected>Select option</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="training">Placement Training</label>
+                    <select id="training" name="training" required>
+                        <option value="" disabled selected>Select option</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="ssc">Class 10th Percentage</label>
+                    <input type="number" id="ssc" name="ssc"
+                           min="0" max="100" step="0.01"
+                           placeholder="Enter percentage" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="hsc">Class 12th Percentage</label>
+                    <input type="number" id="hsc" name="hsc"
+                           min="0" max="100" step="0.01"
+                           placeholder="Enter percentage" required>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    Check your Placement Profile 
+                </button>
+
+            </form>
+
+        </section>
+
+        <!-- RESULTS -->
+        <section class="panel result-panel">
+
+            <h2 class="panel-title">AI Analysis</h2>
+
+            <p class="panel-subtitle">
+                Your placement prediction and personalized insights.
+            </p>
+
+            {% if prediction %}
+
+                <!-- PLACEMENT PREDICTION CARD -->
+                <div class="result-card">
+
+                    <div class="result-label">
+                        Placement Prediction
+                    </div>
+
+                    <div class="prediction
+                        {% if prediction == 'Placed' %}
+                            placed
+                        {% else %}
+                            not-placed
+                        {% endif %}">
+
+                        {{ prediction }}
+
+                    </div>
+
+                    {% if probability is not none %}
+                        <div class="metric">
+                            <span>Model Confidence</span>
+                            <strong>{{ probability }}%</strong>
+                        </div>
+                    {% endif %}
+
+                    {% if readiness_score is defined %}
+                        <div class="readiness-section">
+
+                            <div class="readiness-heading">
+                                <span>Career Readiness Score</span>
+                                <strong>{{ readiness_score }}/100</strong>
+                            </div>
+
+                            <div class="progress-track">
+                                <div class="progress-fill"
+                                     data-score="{{ readiness_score }}">
+                                </div>
+                            </div>
+
+                        </div>
+                    {% endif %}
+
+                </div>
+
+                <!-- FUNNY RESULT SECTION -->
+                <div class="funny-result">
+
+                    {% if prediction == "Placed" %}
+
+                        <img
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR23M_XH6phn0UVco6bZP5tz0JW8RDKegy4gio-VLUFkg&s=10"
+                            alt="Narendra Modi"
+                            class="funny-image"
+                            loading="lazy"
+                        >
+
+                        <h3>Congratulations! </h3>
+
+                        <p>Ab toh Acche Din Aa Gaye! </p>
+
+                    {% elif prediction == "NotPlaced" %}
+
+                        <img
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTix9js0Tz6Oa4asaddAduNPJrpiWsKgt294UfSB0HFxQ&s=10"
+                            alt="Rahul Gandhi"
+                            class="funny-image"
+                            loading="lazy"
+                        >
+
+                        <h3>Don't Worry! Acche Din aa jayenge </h3>
+
+                        <p>Abhi Picture Baaki Hai Mere Dost!</p>
+
+                    {% endif %}
+
+                </div>
+
+                <!-- PERSONALIZED IMPROVEMENT TIPS -->
+                {% if tips %}
+
+                    <div class="tips-section">
+
+                        <h3>✦ Personalized Improvement Tips</h3>
+
+                        <ul class="tips-list">
+
+                            {% for tip in tips %}
+                                <li>{{ tip }}</li>
+                            {% endfor %}
+
+                        </ul>
+
+                    </div>
+
+                {% endif %}
+
+            {% else %}
+
+                <!-- EMPTY STATE -->
+                <div class="empty-state">
+
+                    <div class="empty-icon">✧</div>
+
+                    <h3>Ready for Analysis?</h3>
+
+                    <p>
+                        Submit your student profile to generate
+                        AI-powered placement predictions and insights.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+            <!-- ERROR MESSAGE -->
+            {% if error %}
+
+                <div class="error-box">
+                    {{ error }}
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+
+        <p>Pandey Jayant Kumar &nbsp;|&nbsp; Minor Project 1</p>
+
+        <p>
+            <span>PLACEINTEL AI</span> —
+            "This is just a small project for now, but there is plenty
+            of scope for future improvements and upgrades."
+        </p>
+
+    </footer>
+
+</div>
+
+<!-- READINESS PROGRESS BAR SCRIPT -->
+<script>
+
+    document.querySelectorAll(".progress-fill").forEach(function(bar) {
+
+        const score = Number(bar.dataset.score);
+
+        if (Number.isFinite(score)) {
+
+            const safeScore = Math.max(0, Math.min(100, score));
+
+            bar.style.width = safeScore + "%";
+
+        }
+
+    });
+
+</script>
+
+</body>
+</html>

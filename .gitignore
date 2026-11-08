@@ -1,0 +1,24 @@
+# Python temporary files
+__pycache__/
+*.py[cod]
+*.log
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Environment variables and secrets
+.env
+.env.*
+
+# IDE and system files
+.vscode/
+.DS_Store
+Thumbs.db
+/anaconda_projects/
+/data/01_Placement_Analysis.ipynb
